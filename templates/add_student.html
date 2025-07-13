@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-2xl mb-4">➕ Add Student</h2>
+
+<form method="GET" class="mb-4">
+  <label>Shift:</label>
+  <select name="shift" onchange="this.form.submit()" class="ml-2 px-2 rounded bg-gray-800">
+    {% for s in shifts %}
+      <option value="{{ s }}" {% if s == selected_shift %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<form method="POST" class="bg-gray-800 p-6 rounded space-y-4">
+  <input type="hidden" name="shift" value="{{ selected_shift }}">
+  <div>
+    <label>Name:</label>
+    <input type="text" name="name" required class="w-full rounded px-3 py-2 text-black"/>
+  </div>
+  <div>
+    <label>Father’s Name:</label>
+    <input type="text" name="father_name" required class="w-full rounded px-3 py-2 text-black"/>
+  </div>
+  <div>
+    <label>Mobile:</label>
+    <input type="text" name="mobile" required class="w-full rounded px-3 py-2 text-black"/>
+  </div>
+  <div>
+    <label>Address:</label>
+    <textarea name="address" required class="w-full rounded px-3 py-2 text-black"></textarea>
+  </div>
+  <div>
+    <label>Seat No ({{ selected_shift }}):</label>
+    <select name="seat_no" required class="w-full rounded px-3 py-2 text-black">
+      {% for s in seats %}
+        <option value="{{ s.seat_no }}">{{ s.seat_no }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="bg-blue-600 py-2 rounded hover:bg-blue-700">Add Student</button>
+</form>
+
+{% endblock %}

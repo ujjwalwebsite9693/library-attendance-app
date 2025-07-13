@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-2xl mb-4">💺 View Seats by Shift</h2>
+<form method="POST" class="mb-4">
+  <label>Shift:</label>
+  <select name="shift" class="ml-2 px-2 rounded bg-gray-800 text-white">
+    {% for s in shifts %}
+      <option value="{{ s }}" {% if s == selected_shift %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="ml-2 bg-blue-600 px-3 py-1 rounded">View</button>
+</form>
+
+<div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-10 gap-4">
+  {% for seat in seats %}
+  <div class="p-3 text-center rounded font-bold text-white {% if seat.assigned %}bg-green-600{% else %}bg-red-600{% endif %}">
+    {{ seat.number }}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="text-2xl mb-4">👥 View Students</h2>
+
+<!-- Search and Export Controls -->
+<div class="flex flex-wrap items-center justify-between mb-4">
+  <form method="GET" action="{{ url_for('view_students') }}" class="flex gap-2 flex-wrap">
+    <input type="text" name="search" placeholder="Search by Name or Seat No." value="{{ request.args.get('search', '') }}" class="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" />
+    <select name="limit" class="px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" onchange="this.form.submit()">
+      {% for l in [10, 25, 50, 100] %}
+        <option value="{{ l }}" {% if limit == l %}selected{% endif %}>Show {{ l }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 text-white">Search</button>
+  </form>
+  <a href="{{ url_for('export_students_pdf', search=request.args.get('search', '')) }}" class="bg-green-600 px-4 py-2 rounded text-white hover:bg-green-700">📄 Export PDF</a>
+</div>
+
+<!-- Student Table -->
+<table class="min-w-full text-left bg-gray-800 rounded">
+  <thead>
+    <tr>
+      <th class="px-4 py-2">Name</th>
+      <th>Father's Name</th>
+      <th>Seat No.</th>
+      <th>Shift</th>
+      <th>Mobile No.</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in students %}
+    <tr class="border-b border-gray-700">
+      <td class="px-4 py-2">{{ s.name }}</td>
+      <td>{{ s.father_name }}</td>
+      <td>{{ s.seat_no }}</td>
+      <td>{{ s.shift }}</td>
+      <td>{{ s.mobile }}</td>
+      <td>
+        <form method="POST" action="/delete_student/{{ s.id }}" onsubmit="return confirm('Delete this student?');">
+          <button class="bg-red-600 px-2 py-1 rounded hover:bg-red-700 text-sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Pagination -->
+<div class="mt-4 flex justify-between items-center">
+  <div>
+    Showing {{ start_index + 1 }} to {{ end_index }} of {{ total }} entries
+  </div>
+  <div class="flex gap-2">
+    {% if page > 1 %}
+      <a href="{{ url_for('view_students', page=page-1, limit=limit, search=request.args.get('search', '')) }}" class="bg-gray-600 px-3 py-1 rounded hover:bg-gray-700 text-white">Previous</a>
+    {% endif %}
+    {% if end_index < total %}
+      <a href="{{ url_for('view_students', page=page+1, limit=limit, search=request.args.get('search', '')) }}" class="bg-gray-600 px-3 py-1 rounded hover:bg-gray-700 text-white">Next</a>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

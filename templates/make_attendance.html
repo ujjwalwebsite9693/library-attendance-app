@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">✅ Mark Attendance (Today)</h2>
+
+<!-- 🔍 Search Filter -->
+<input type="text" id="searchInput" placeholder="Search by name or seat no..."
+       class="mb-4 w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600" />
+
+<form method="GET" action="/export_attendance_pdf_by_date" class="flex items-center gap-4 mb-4">
+  <div>
+    <label for="date" class="text-white">📅 Date:</label>
+    <input type="date" id="date" name="date" required class="rounded p-1 text-black">
+  </div>
+  <div>
+    <label for="shift" class="text-white">⏱ Shift:</label>
+    <select id="shift" name="shift" required class="rounded p-1 text-black">
+      <option value="6–10 AM">6–10 AM</option>
+      <option value="10–2 PM">10–2 PM</option>
+      <option value="2–6 PM">2–6 PM</option>
+      <option value="6–10 PM">6–10 PM</option>
+      <option value="Night">Night</option>
+    </select>
+  </div>
+  <button type="submit" class="bg-blue-600 px-3 py-1 rounded text-white hover:bg-blue-700">
+    Export Attendance PDF
+  </button>
+</form>
+
+<!-- 📤 Export Buttons -->
+<form method="GET" action="/export_attendance_pdf" class="mb-4">
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    📄 Export Today's Attendance PDF
+  </button>
+</form>
+
+
+<form method="POST">
+  <table id="attendanceTable" class="min-w-full bg-gray-800 text-white rounded shadow">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 text-left">Name</th>
+        <th class="py-2 px-4 text-left">Seat No.</th>
+        <th class="py-2 px-4 text-left">Last Marked</th>
+        <th class="py-2 px-4 text-left">Current Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr class="border-b border-gray-700">
+        <td class="py-2 px-4">{{ s.name }}</td>
+        <td class="py-2 px-4">{{ s.seat_no }}</td>
+        <td class="py-2 px-4">{{ s.last_attendance or '—' }}</td>
+        <td class="py-2 px-4">
+          <div class="flex items-center space-x-4">
+            <!-- Show badge -->
+            <span class="text-sm font-semibold px-2 py-1 rounded
+              {% if s.status == 'Present' %} bg-green-600 {% else %} bg-red-600 {% endif %}">
+              {{ s.status }}
+            </span>
+
+            <!-- Dropdown to update -->
+            <select name="status_{{ s.id }}" class="bg-gray-700 text-white rounded px-2 py-1">
+              <option value="Present" {% if s.status == 'Present' %}selected{% endif %}>Present</option>
+              <option value="Absent" {% if s.status == 'Absent' %}selected{% endif %}>Absent</option>
+            </select>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="submit" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">💾 Save Attendance</button>
+</form>
+
+<!-- 🔍 JS Filter -->
+<script>
+  document.getElementById('searchInput').addEventListener('keyup', function () {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#attendanceTable tbody tr');
+    rows.forEach(row => {
+      let name = row.cells[0].innerText.toLowerCase();
+      let seat = row.cells[1].innerText.toLowerCase();
+      row.style.display = (name.includes(filter) || seat.includes(filter)) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

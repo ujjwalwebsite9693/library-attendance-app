@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">📊 Admin Dashboard</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+  <div class="bg-gray-800 p-6 rounded">
+    <h3>Total Students</h3><p class="text-3xl">{{ total_students }}</p>
+  </div>
+  <div class="bg-gray-800 p-6 rounded">
+    <h3>Total Seats</h3><p class="text-3xl">{{ total_seats }}</p>
+  </div>
+  <div class="bg-green-800 p-6 rounded">
+    <h3>Assigned Seats</h3><p class="text-3xl">{{ assigned_seats }}</p>
+  </div>
+  <div class="bg-red-800 p-6 rounded">
+    <h3>Unassigned Seats</h3><p class="text-3xl">{{ unassigned_seats }}</p>
+  </div>
+  <div class="bg-gray-800 p-6 rounded">
+    <h3>Present Today</h3><p class="text-3xl">{{ present_today }}</p>
+  </div>
+  <div class="bg-gray-800 p-6 rounded">
+    <h3>Absent Today</h3><p class="text-3xl">{{ attendance_pending }}</p>
+  </div>
+  <div class="bg-yellow-800 p-6 rounded">
+    <h3>Attendance Pending</h3><p class="text-3xl">{{ attendance_pending }}</p>
+  </div>
+  <div class="bg-blue-800 p-6 rounded">
+    <h3>Paid Students (This Month)</h3><p class="text-3xl">{{ paid_students }}</p>
+  </div>
+  <div class="bg-purple-800 p-6 rounded">
+    <h3>Unpaid Students (This Month)</h3><p class="text-3xl">{{ unpaid_students }}</p>
+  </div>
+</div>
+
+<!-- Notifications -->
+<h3 class="text-xl font-bold text-yellow-400 mb-2">⚠️ Pending Notifications</h3>
+<ul class="list-disc list-inside text-white space-y-1">
+  <li>{{ attendance_pending }} students have not been marked Present today.</li>
+</ul>
+
+{% endblock %}
