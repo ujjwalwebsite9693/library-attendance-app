@@ -1,9 +1,6 @@
 services:
   - type: web
-    name: library-app
+    name: library-attendance-app
     env: python
-    buildCommand: ""
-    startCommand: "python app.py"
-    envVars:
-      - key: FLASK_ENV
-        value: production
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
