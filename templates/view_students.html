@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
+{% block title %} All Students{% endblock %}
+{% block extra_body_class %}bg-green-400{% endblock %}
 {% block content %}
 
 <h2 class="text-2xl mb-4">👥 View Students</h2>
@@ -26,6 +28,9 @@
       <th>Seat No.</th>
       <th>Shift</th>
       <th>Mobile No.</th>
+      <th>Username</th>
+      <th>Password</th>
+      <th>Unique Id</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -37,6 +42,9 @@
       <td>{{ s.seat_no }}</td>
       <td>{{ s.shift }}</td>
       <td>{{ s.mobile }}</td>
+      <td>{{ s.username }}</td>
+      <td>{{ s.password }}</td>
+      <td>{{ s.unique_id }}</td>
       <td>
         <form method="POST" action="/delete_student/{{ s.id }}" onsubmit="return confirm('Delete this student?');">
           <button class="bg-red-600 px-2 py-1 rounded hover:bg-red-700 text-sm">Delete</button>
