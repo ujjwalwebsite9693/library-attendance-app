@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard</title>
+  <link href="/static/css/tailwind.min.css" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
+  <style>
+    .flash-message {
+      transition: opacity 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white min-h-screen font-sans">
+
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div id="flash" class="mb-6">
+        {% for category, message in messages %}
+          <div class="flash-message p-4 rounded mb-3 
+            {% if category == 'success' %}bg-green-600{% elif category == 'error' %}bg-red-600{% elif category == 'info' %}bg-blue-600{% else %}bg-yellow-600{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">👋 Welcome, <span class="text-blue-400">{{ student.name }}</span></h1>
+    <p class="text-gray-300">Your attendance and payment summary for this month.</p>
+  </div>
+
+  <!-- Summary Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+    <!-- Today Status -->
+    <div class="bg-gray-800 p-5 rounded shadow-lg border border-gray-700">
+      <h2 class="text-lg text-gray-300 mb-2">📅 Today</h2>
+      <p class="text-2xl font-bold 
+        {% if today_status == 'Present' %}text-green-400
+        {% elif today_status == 'Absent' %}text-red-400
+        {% else %}text-yellow-400{% endif %}">
+        {{ today_status }}
+      </p>
+    </div>
+
+    <!-- Payment Status -->
+    <div class="bg-gray-800 p-5 rounded shadow-lg border border-gray-700">
+      <h2 class="text-lg text-gray-300 mb-2">💰 Payment</h2>
+      <p class="text-2xl font-bold {% if payment_status == 'Paid' %}text-green-400{% else %}text-red-400{% endif %}">
+        {{ payment_status }}
+      </p>
+    </div>
+
+    <!-- Present Days -->
+    <div class="bg-gray-800 p-5 rounded shadow-lg border border-gray-700">
+      <h2 class="text-lg text-gray-300 mb-2">🟢 Present</h2>
+      <p class="text-2xl font-bold text-green-400">{{ present_days }}</p>
+    </div>
+
+    <!-- Absent Days -->
+    <div class="bg-gray-800 p-5 rounded shadow-lg border border-gray-700">
+      <h2 class="text-lg text-gray-300 mb-2">🔴 Absent</h2>
+      <p class="text-2xl font-bold text-red-400">{{ absent_days }}</p>
+    </div>
+  </div>
+
+ <!-- Mark Attendance Button -->
+  {% if not already_marked %}
+    <form method="POST">
+      <input type="hidden" name="mark_attendance" value="1">
+      <input type="hidden" name="public_ip" id="public_ip" value="">
+      <div class="text-center mb-10">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow">
+          ✅ Mark Today's Attendance
+        </button>
+      </div>
+    </form>
+  {% else %}
+    <div class="text-center mb-10 text-green-400 text-lg">
+      ✅ You have already marked attendance today.
+    </div>
+  {% endif %}
+
+    <!-- Change Username & Password Section -->
+  <div class="bg-gray-800 text-white p-6 rounded shadow mt-8 max-w-xl mx-auto">
+  <h3 class="text-xl font-bold mb-4">🔐 Update Username & Password</h3>
+<form method="POST" action="/student/change_password" class="bg-gray-800 p-4 rounded shadow w-full max-w-md">
+  <label class="block mb-2">Username:</label>
+  <input type="text" value="{{ student.username }}" readonly class="bg-gray-700 text-white px-3 py-2 rounded w-full mb-4" />
+
+  <label class="block mb-2">New Password:</label>
+  <input type="password" name="new_password" required class="text-black px-3 py-2 rounded w-full mb-4" />
+
+  <label class="block mb-2">Confirm Password:</label>
+  <input type="password" name="confirm_password" required class="text-black px-3 py-2 rounded w-full mb-4" />
+
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update Password</button>
+</form>
+</div>
+
+
+  <!-- Attendance Table -->
+  <h2 class="text-2xl font-semibold mb-4">📊 Monthly Attendance</h2>
+  <div class="overflow-x-auto rounded shadow-lg">
+    <table class="min-w-full bg-gray-900 text-white border border-gray-700">
+      <thead class="bg-blue-700 text-white">
+        <tr>
+          <th class="py-3 px-4 text-left">Date</th>
+          <th class="py-3 px-4 text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in attendance %}
+        <tr class="border-t border-gray-800">
+          <td class="py-2 px-4 text-gray-200">{{ entry.date }}</td>
+          <td class="py-2 px-4">
+            {% if entry.status == 'Present' %}
+              <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">Present</span>
+            {% else %}
+              <span class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">Absent</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Logout -->
+  <div class="mt-10 text-center">
+    <a href="/student_logout" class="inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow">
+      🔒 Logout
+    </a>
+  </div>
+</div>
+  <footer class="bg-blue-100 text-black py-1">
+    <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center text-sm">
+      <!-- Social icons -->
+      <div class="flex items-center gap-4 mb-2 sm:mb-0">
+        <a href="https://www.instagram.com/its_ujjwal.x/" target="_blank">
+          <img src="https://img.icons8.com/ios-filled/24/000000/instagram-new.png" alt="Instagram"/>
+        </a>
+        <a href="https://t.me/Ujjwal_mehta_1" target="_blank">
+          <img src="https://img.icons8.com/ios-filled/24/000000/telegram-app.png" alt="Telegram"/>
+        </a>
+      </div>
+
+      <!-- Copyright -->
+      <div class="text-center sm:ml-4 mb-2 sm:mb-0">
+        © Copyright Under <strong>.....Library</strong>
+        <br>
+        Created By Ujjwal's Code Team. For your own application,contact:
+        <a href="https://t.me/Ujjwal_mehta_1" class="underline text-blue-400" target="_blank">@Ujjwal_mehta_1</a>
+                <a href="https://www.instagram.com/its_ujjwal.x/" class="underline text-blue-400" target="_blank">@its_ujjwal.x</a>
+
+
+      </div>
+  </footer>
+  <!-- Script to fetch student's public IP and set it in hidden input -->
+  <script>
+    fetch("https://api.ipify.org?format=json")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("public_ip").value = data.ip;
+        console.log("Detected Public IP:", data.ip);
+      })
+      .catch(error => {
+        console.error("Failed to get public IP:", error);
+      });
+  </script>
+   <script>
+  // Auto hide flash messages
+  setTimeout(() => {
+    const flashDiv = document.getElementById('flash');
+    if (flashDiv) {
+      flashDiv.style.opacity = '0';
+      setTimeout(() => flashDiv.remove(), 500);
+    }
+  }, 5000);
+</script>
+
+</body>
+</html>
