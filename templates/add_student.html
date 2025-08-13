@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
+{% block extra_body_class %}bg-yellow-600{% endblock %}
+{% block title %}Add Student{% endblock %}
 {% block content %}
+
 <h2 class="text-2xl mb-4">➕ Add Student</h2>
 
+<!-- Shift Selector -->
 <form method="GET" class="mb-4">
   <label>Shift:</label>
   <select name="shift" onchange="this.form.submit()" class="ml-2 px-2 rounded bg-gray-800">
@@ -11,33 +15,55 @@
   </select>
 </form>
 
+<!-- Add Student Form -->
 <form method="POST" class="bg-gray-800 p-6 rounded space-y-4">
   <input type="hidden" name="shift" value="{{ selected_shift }}">
+
+  <!-- Student Name (Only letters and spaces) -->
   <div>
-    <label>Name:</label>
-    <input type="text" name="name" required class="w-full rounded px-3 py-2 text-black"/>
+    <label class="block text-white mb-1">Name:</label>
+    <input type="text" name="name" required 
+           pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
+           class="w-full rounded px-3 py-2 text-black"/>
   </div>
+
+  <!-- Father’s Name (Only letters and spaces) -->
   <div>
-    <label>Father’s Name:</label>
-    <input type="text" name="father_name" required class="w-full rounded px-3 py-2 text-black"/>
+    <label class="block text-white mb-1">Father’s Name:</label>
+    <input type="text" name="father_name" required 
+           pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
+           class="w-full rounded px-3 py-2 text-black"/>
   </div>
+
+  <!-- Mobile (10 digit number only) -->
   <div>
-    <label>Mobile:</label>
-    <input type="text" name="mobile" required class="w-full rounded px-3 py-2 text-black"/>
+    <label class="block text-white mb-1">Mobile:</label>
+    <input type="text" name="mobile" required pattern="\d{10}" maxlength="10"
+           title="Enter exactly 10 digit mobile number"
+           class="w-full rounded px-3 py-2 text-black"/>
   </div>
+
+  <!-- Address (Text and numbers allowed) -->
   <div>
-    <label>Address:</label>
-    <textarea name="address" required class="w-full rounded px-3 py-2 text-black"></textarea>
+    <label class="block text-white mb-1">Address:</label>
+    <textarea name="address" required
+              class="w-full rounded px-3 py-2 text-black"></textarea>
   </div>
+
+  <!-- Seat Number -->
   <div>
-    <label>Seat No ({{ selected_shift }}):</label>
+    <label class="block text-white mb-1">Seat No ({{ selected_shift }}):</label>
     <select name="seat_no" required class="w-full rounded px-3 py-2 text-black">
       {% for s in seats %}
         <option value="{{ s.seat_no }}">{{ s.seat_no }}</option>
       {% endfor %}
     </select>
   </div>
-  <button type="submit" class="bg-blue-600 py-2 rounded hover:bg-blue-700">Add Student</button>
+
+  <!-- Submit Button -->
+  <button type="submit" class="bg-green-600 py-2 px-4 rounded hover:bg-blue-700 text-white">
+    ➕ Add Student
+  </button>
 </form>
 
 {% endblock %}
