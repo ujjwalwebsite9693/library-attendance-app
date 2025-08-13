@@ -1,53 +1,133 @@
 {% extends "layout.html" %}
+{% block title %}Student Payments{% endblock %}
+{% block extra_body_class %}bg-pink-400{% endblock %}
 {% block content %}
 <h2 class="text-2xl font-bold mb-6">💰 Check & Update Payments</h2>
-<div>
-<form method="GET" action="/export_students_payment_pdf" class="mb-4">
-  <button type="submit" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
-    📤 Export Paid Students PDF
-  </button>
-</form>
-<form method="GET" action="/export_unpaid_students_pdf" class="mb-4">
-  <button type="submit" class="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
-    📤 Export Unpaid Students PDF
-  </button>
-</form>
+
+<!-- Filter Controls -->
+<div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+  <!-- Shift Dropdown -->
+  <select id="shiftSelector" class="px-4 py-2 rounded text-black border border-gray-300 focus:outline-none focus:ring focus:border-blue-300">
+    <option value="All">All Shifts</option>
+    {% for shift in shifts %}
+      <option value="{{ shift }}">{{ shift }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- Search Input -->
+  <input type="text" id="searchBox" placeholder="Search Unique ID..." 
+         class="px-4 py-2 rounded text-black border border-gray-300 focus:outline-none focus:ring focus:border-blue-300 w-full sm:w-auto">
+
+  <!-- Export Buttons -->
+  <div class="flex gap-2">
+    <form method="GET" action="/export_students_payment_pdf">
+      <button type="submit" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm">
+        📤 Export Paid PDF
+      </button>
+    </form>
+    <form method="GET" action="/export_unpaid_students_pdf">
+      <button type="submit" class="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm">
+        📤 Export Unpaid PDF
+      </button>
+    </form>
+  </div>
 </div>
 
-<table class="min-w-full bg-gray-800 text-white rounded shadow">
-  <thead>
-    <tr>
-      <th class="py-2 px-4">Name</th>
-      <th class="py-2 px-4">Seat No.</th>
-      <th class="py-2 px-4">Mobile</th>
-      <th class="py-2 px-4">Current Status</th>
-      <th class="py-2 px-4">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for s in students %}
-    <tr class="border-b border-gray-700">
-      <td class="py-2 px-4">{{ s.name }}</td>
-      <td class="py-2 px-4">{{ s.seat_no }}</td>
-      <td class="py-2 px-4">{{ s.mobile }}</td>
-      <td class="py-2 px-4">
-        {% if s.payment_status == "Paid" %}
-          <span class="bg-green-600 px-2 py-1 rounded">Paid</span>
-        {% else %}
-          <span class="bg-red-600 px-2 py-1 rounded">Unpaid</span>
-        {% endif %}
-      </td>
-      <td class="py-2 px-4">
-        {% if s.payment_status == "Unpaid" %}
-        <form method="POST" action="{{ url_for('update_payment', student_id=s.id) }}">
-          <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm">Mark as Paid</button>
-        </form>
-        {% else %}
-        <span class="text-gray-400 text-sm italic">Already Paid</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<!-- Table -->
+<div class="overflow-x-auto bg-gray-800 rounded shadow">
+  <table class="min-w-full text-white">
+    <thead class="bg-gray-700 text-sm">
+      <tr>
+        <th class="py-2 px-4 text-left">Unique ID</th>
+        <th class="py-2 px-4 text-left">Name</th>
+        <th class="py-2 px-4 text-left">Shift</th>
+        <th class="py-2 px-4 text-left">Seat No.</th>
+        <th class="py-2 px-4 text-left">Mobile</th>
+        <th class="py-2 px-4 text-left">Last Payment</th>
+        <th class="py-2 px-4 text-left">Status</th>
+        <th class="py-2 px-4 text-left">Action</th>
+      </tr>
+    </thead>
+    <tbody id="studentTableBody">
+      {% for s in students %}
+      <tr class="border-b border-gray-700 student-row" data-shift="{{ s.shift }}">
+        <td class="py-2 px-4 unique-id">{{ s.unique_id }}</td>
+        <td class="py-2 px-4">{{ s.name }}</td>
+        <td class="py-2 px-4">{{ s.shift }}</td>
+        <td class="py-2 px-4">{{ s.seat_no }}</td>
+        <td class="py-2 px-4">{{ s.mobile }}</td>
+        <td class="py-2 px-4">{{ s.last_paid_date }}</td>
+        <td class="py-2 px-4">
+          {% if s.payment_status == "Paid" %}
+            <span class="bg-green-600 px-2 py-1 rounded text-sm">Paid</span>
+          {% else %}
+            <span class="bg-red-600 px-2 py-1 rounded text-sm">Unpaid</span>
+          {% endif %}
+        </td>
+        <td class="py-2 px-4">
+          {% if s.payment_status == "Unpaid" %}
+          <form method="POST" action="/payments/mark/{{ s.id }}">
+            <input type="password" name="payment_password" placeholder="Password" required 
+                   class="px-2 py-1 text-black rounded text-sm" />
+            <button type="submit" class="bg-green-600 px-2 py-1 rounded hover:bg-green-700 text-sm text-white">
+              Mark as Paid
+            </button>
+          </form>
+          {% else %}
+            <span class="text-gray-400 text-sm italic">Already Paid</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<div class="flex justify-center mt-6">
+  <button onclick="prevPage()" class="px-3 py-1 bg-gray-700 text-white rounded mx-1 hover:bg-gray-600">Prev</button>
+  <span id="pageInfo" class="px-3 py-1 bg-gray-900 text-white rounded mx-1">Page 1</span>
+  <button onclick="nextPage()" class="px-3 py-1 bg-gray-700 text-white rounded mx-1 hover:bg-gray-600">Next</button>
+</div>
+
+<!-- Script -->
+<script>
+  const shiftSelector = document.getElementById('shiftSelector');
+  const searchBox = document.getElementById('searchBox');
+  const rows = Array.from(document.querySelectorAll('.student-row'));
+  const rowsPerPage = 10;
+  let currentPage = 1;
+
+  function filterRows() {
+    const selectedShift = shiftSelector.value;
+    const searchQuery = searchBox.value.trim().toLowerCase();
+
+    rows.forEach(row => {
+      const uid = row.querySelector('.unique-id').innerText.toLowerCase();
+      const rowShift = row.getAttribute('data-shift');
+      const shiftMatch = (selectedShift === 'All' || selectedShift === rowShift);
+      const searchMatch = uid.includes(searchQuery);
+      row.style.display = (shiftMatch && searchMatch) ? '' : 'none';
+    });
+    currentPage = 1;
+    renderPage(currentPage);
+  }
+
+  function renderPage(page) {
+    const visibleRows = rows.filter(row => row.style.display !== 'none');
+    const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+    currentPage = Math.max(1, Math.min(page, totalPages));
+    visibleRows.forEach((row, index) => {
+      row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? '' : 'none';
+    });
+    document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages || 1}`;
+  }
+
+  function nextPage() { renderPage(currentPage + 1); }
+  function prevPage() { renderPage(currentPage - 1); }
+
+  shiftSelector.addEventListener('change', filterRows);
+  searchBox.addEventListener('input', filterRows);
+  filterRows();
+</script>
 {% endblock %}
