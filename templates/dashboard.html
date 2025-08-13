@@ -1,35 +1,66 @@
 {% extends "layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
 {% block content %}
 <h2 class="text-2xl font-bold mb-6">📊 Admin Dashboard</h2>
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-  <div class="bg-gray-800 p-6 rounded">
+  <div class="bg-pink-500 hover:bg-yellow-600 p-6 rounded">
     <h3>Total Students</h3><p class="text-3xl">{{ total_students }}</p>
   </div>
-  <div class="bg-gray-800 p-6 rounded">
+  <div class="bg-blue-700 hover:bg-red-800 p-6 rounded">
     <h3>Total Seats</h3><p class="text-3xl">{{ total_seats }}</p>
   </div>
-  <div class="bg-green-800 p-6 rounded">
-    <h3>Assigned Seats</h3><p class="text-3xl">{{ assigned_seats }}</p>
+  <div class="bg-green-600 hover:bg-pink-700 p-6 rounded">
+    <h3>Booked Seats</h3><p class="text-3xl">{{ assigned_seats }}</p>
   </div>
-  <div class="bg-red-800 p-6 rounded">
-    <h3>Unassigned Seats</h3><p class="text-3xl">{{ unassigned_seats }}</p>
-  </div>
-  <div class="bg-gray-800 p-6 rounded">
+  <div class="bg-blue-400 hover:bg-green-700 p-6 rounded">
     <h3>Present Today</h3><p class="text-3xl">{{ present_today }}</p>
   </div>
-  <div class="bg-gray-800 p-6 rounded">
+  <div class="bg-green-400 hover:bg-purple-700 p-6 rounded">
     <h3>Absent Today</h3><p class="text-3xl">{{ attendance_pending }}</p>
   </div>
-  <div class="bg-yellow-800 p-6 rounded">
+  <div class="bg-yellow-400 hover:bg-red-700 p-6 rounded">
     <h3>Attendance Pending</h3><p class="text-3xl">{{ attendance_pending }}</p>
   </div>
-  <div class="bg-blue-800 p-6 rounded">
+  <div class="bg-blue-800 hover:bg-gray-700 p-6 rounded">
     <h3>Paid Students (This Month)</h3><p class="text-3xl">{{ paid_students }}</p>
   </div>
-  <div class="bg-purple-800 p-6 rounded">
+  <div class="bg-purple-800 hover:bg-pink-700 p-6 rounded">
     <h3>Unpaid Students (This Month)</h3><p class="text-3xl">{{ unpaid_students }}</p>
   </div>
+</div> <br>
+<h2 class="text-2xl font-bold mb-6">🪑 Unassigned Seats per Shift</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+  {% for shift, count in shift_seat_data.items() %}
+    {% set bg_color = "" %}
+    {% set icon = "" %}
+    {% if shift == "6–10 AM" %}
+      {% set bg_color = "bg-blue-600 hover:bg-blue-700" %}
+      {% set icon = "☀️" %}
+    {% elif shift == "10–2 PM" %}
+      {% set bg_color = "bg-green-600 hover:bg-green-700" %}
+      {% set icon = "🌤️" %}
+    {% elif shift == "2–6 PM" %}
+      {% set bg_color = "bg-yellow-600 hover:bg-yellow-700 text-black" %}
+      {% set icon = "🌇" %}
+    {% elif shift == "6–10 PM" %}
+      {% set bg_color = "bg-purple-600 hover:bg-purple-700" %}
+      {% set icon = "🌆" %}
+    {% elif shift == "Night" %}
+      {% set bg_color = "bg-red-600 hover:bg-red-700" %}
+      {% set icon = "🌙" %}
+    {% endif %}
+
+    <div class="{{ bg_color }} rounded shadow p-4 transition duration-300">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold">Shift: {{ shift }}</h3>
+        <span class="text-xl">{{ icon }}</span>
+      </div>
+      <p class="text-2xl font-bold">{{ count }}</p>
+      <p class="text-sm opacity-90 {% if "text-black" not in bg_color %}text-gray-200{% endif %}">Unassigned Seats</p>
+    </div>
+  {% endfor %}
 </div>
+
 
 <!-- Notifications -->
 <h3 class="text-xl font-bold text-yellow-400 mb-2">⚠️ Pending Notifications</h3>
