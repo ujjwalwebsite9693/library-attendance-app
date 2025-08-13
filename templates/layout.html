@@ -2,67 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Library Admin Panel</title>
+  <title>{% block title %}Library Admin Panel{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.min.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <nav class="bg-gray-800 shadow p-4 flex justify-between items-center">
-        <div class="text-xl font-bold text-white">📚 Library Admin Panel</div>
-        <div class="space-x-4">
-            <a href="/dashboard" class="hover:underline text-white-300">🏠 Dashboard</a>
-            <a href="/add_student" class="hover:underline text-yellow-300">➕ Add Student</a>
-            <a href="/view_students" class="hover:underline text-green-300">👥 Students</a>
-            <a href="/view_seats" class="hover:underline text-blue-500">💺 Seats</a>
-            <a href="/make_attendance" class="hover:underline text-gray-300">✅ Attendance</a>
-            <a href="/check_payments" class="hover:underline text-pink-300">💰 Payments</a>
-            <a href="/change_password" class="hover:underline text-yellow-100"> 🔏Change Password</a>
-            <a href="/logout" class="hover:underline text-red-400">🔐Logout</a>
-        </div>
-    </nav>
 
+<!-- Apply flex and min-h-screen to body -->
+<body class="{% block extra_body_class %}bg-gray-900{% endblock %} text-white min-h-screen font-sans flex flex-col">
+
+  <!-- NAVBAR -->
+  <nav class="bg-gray-800 shadow p-4 flex justify-between items-center">
+    <div class="text-xl font-bold text-white">📚 Library Admin Panel</div>
+    <div class="space-x-4">
+      <a href="/dashboard" class="hover:underline text-white-300">🏠 Dashboard</a>
+      <a href="/add_student" class="hover:underline text-yellow-300">➕ Add Student</a>
+      <a href="/view_students" class="hover:underline text-green-300">👥 Students</a>
+      <a href="/view_seats" class="hover:underline text-blue-500">💺 Seats</a>
+      <a href="/make_attendance" class="hover:underline text-gray-300">✅ Attendance</a>
+      <a href="/check_payments" class="hover:underline text-pink-300">💰 Payments</a>
+      <a href="/student_info" class="hover:underline text-pink-300">📝 Student Info</a>
+      <a href="/change_password" class="hover:underline text-yellow-100"> 🔏 Change Password</a>
+      <a href="/logout" class="hover:underline text-red-400">🔐Logout</a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT inside flex-grow wrapper -->
+  <div class="flex-grow">
     <main class="p-6 max-w-7xl mx-auto">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="bg-yellow-600 p-4 rounded mb-4 text-white">
-              {% for message in messages %}
-                <p>{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="bg-yellow-600 p-4 rounded mb-4 text-white">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
     </main>
-
-   <footer class="bg-blue-100 text-black py-4 mt-10">
-  <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center">
-    <!-- Left side: social icons -->
-    <div class="flex items-center gap-4 mb-2 sm:mb-0">
-      <a href="https://www.instagram.com/ujjwal_mehta.__/" target="_blank">
-  <img src="https://img.icons8.com/ios-filled/24/000000/instagram-new.png" alt="Instagram"/>
-      </a>
-      <a href="https://t.me/Ujjwal_mehta_1" target="_blank">
- <img src="https://img.icons8.com/ios-filled/24/000000/telegram-app.png" alt="Telegram"/>
-      </a>
-      <br>
-      </div>
-    <div class="text-sm text-right">
-      Location: Vill + Po :- Sarbahda <br> Sarbahda, Khizersarai <br>Gaya, Bihar, 823311.
-    </div>
-
-    <!-- Center: copyright -->
-    <div class="text-sm text-center">
-      © Copyright Under <strong>Ujjwal</strong> <br> Made With Heart ❤️
-    </div>
-
-    <!-- Right side: contact -->
-    <div class="text-sm text-right">
-      Created By Ujjwal's Code Team <br>
-      For your own application ,<br> contact me:
-      <a href="https://t.me/Ujjwal_mehta_1" class="underline text-blue-400" target="_blank">@Ujjwal_mehta_1</a>
-    </div>
   </div>
-</footer>
+
+  <!-- FOOTER -->
+  <footer class="bg-blue-100 text-black py-0">
+    <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center text-sm">
+      <!-- Social icons -->
+      <div class="flex items-center gap-4 mb-2 sm:mb-0">
+        <a href="https://www.instagram.com/its_ujjwal.x/" target="_blank">
+          <img src="https://img.icons8.com/ios-filled/24/000000/instagram-new.png" alt="Instagram"/>
+        </a>
+        <a href="https://t.me/Ujjwal_mehta_1" target="_blank">
+          <img src="https://img.icons8.com/ios-filled/24/000000/telegram-app.png" alt="Telegram"/>
+        </a>
+      </div>
+
+      <!-- Location -->
+      <div class="text-center sm:text-right sm:ml-4 mb-2 sm:mb-0">
+        Location: Vill + Po :- Sarbahda <br> Sarbahda, Khizersarai <br>Gaya, Bihar, 823311.
+      </div>
+
+      <!-- Copyright -->
+      <div class="text-center sm:ml-4 mb-2 sm:mb-0">
+        © Copyright Under <strong>....Library</strong>
+      </div>
+
+      <!-- Contact -->
+      <div class="text-center sm:text-right sm:ml-4">
+        Created By Ujjwal's Code Team <br>
+        For your own application,<br> contact:
+        <a href="https://t.me/Ujjwal_mehta_1" class="underline text-blue-400" target="_blank">@Ujjwal_mehta_1</a>
+      </div>
+    </div>
+  </footer>
 
 </body>
 </html>
