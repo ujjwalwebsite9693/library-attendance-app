@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
+{% block title %}View Seats{% endblock %}
+{% block extra_body_class %}bg-blue-600{% endblock %}
 {% block content %}
 <h2 class="text-2xl mb-4">💺 View Seats by Shift</h2>
 <form method="POST" class="mb-4">
@@ -8,7 +10,7 @@
       <option value="{{ s }}" {% if s == selected_shift %}selected{% endif %}>{{ s }}</option>
     {% endfor %}
   </select>
-  <button type="submit" class="ml-2 bg-blue-600 px-3 py-1 rounded">View</button>
+  <button type="submit" class="ml-2 bg-black px-3 py-1 rounded">View</button>
 </form>
 
 <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-10 gap-4">
