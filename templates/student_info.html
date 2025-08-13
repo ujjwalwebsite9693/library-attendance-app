@@ -1,0 +1,140 @@
+{% extends "layout.html" %}
+{% block title %}Student Full Info{% endblock %}
+{% block content %}
+
+<h2 class="text-3xl font-bold mb-6 text-white">🔍 Search Student by Unique ID</h2>
+
+<!-- 🔍 Search Form -->
+<form method="POST" class="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+  <input type="text" name="unique_id" placeholder="Enter Unique ID" required 
+         class="px-4 py-2 rounded text-black w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition duration-200">
+    Search
+  </button>
+</form>
+
+{% if student %}
+  <!-- Student Info Card -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-2xl font-semibold text-white">📄 Student Details</h3>
+      <a href="/export_student_info_pdf/{{ student.unique_id }}" 
+         class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        📄 Export as PDF
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-white">
+      <p><span class="font-semibold">Name:</span> {{ student.name }}</p>
+      <p><span class="font-semibold">Father's Name:</span> {{ student.father_name }}</p>
+      <p><span class="font-semibold">Mobile:</span> {{ student.mobile }}</p>
+      <p><span class="font-semibold">Shift:</span> {{ student.shift }}</p>
+      <p><span class="font-semibold">Seat No:</span> {{ student.seat_no }}</p>
+      <p><span class="font-semibold">Registration Date:</span> {{ student.registration_date }}</p>
+      <p><span class="font-semibold">Username:</span> {{ student.username }}</p>
+      <p><span class="font-semibold">Password:</span> {{ student.password }}</p>
+      <p><span class="font-semibold">Unique ID:</span> {{ student.unique_id }}</p>
+    </div>
+  </div>
+
+  <!-- 🛠 Update Seat & Shift Form -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow mb-8">
+<h3 class="text-lg font-semibold mb-2 mt-6">🛠 Update Seat & Shift</h3>
+<form method="POST" action="/update_student_info" class="mb-6 bg-gray-800 p-4 rounded shadow text-white">
+  <input type="hidden" name="student_id" value="{{ student.id }}">
+  
+  <div class="mb-3">
+    <label class="block mb-1">Select Shift:</label>
+    <select id="shiftSelect" name="shift" required 
+            class="text-black px-2 py-1 rounded w-full">
+      <option value="">--Select Shift--</option>
+      <option value="6–10 AM">6–10 AM</option>
+      <option value="10–2 PM">10–2 PM</option>
+      <option value="2–6 PM">2–6 PM</option>
+      <option value="6–10 PM">6–10 PM</option>
+      <option value="Night">Night</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="block mb-1">Select Seat No:</label>
+    <select id="seatSelect" name="seat_no" required 
+            class="text-black px-2 py-1 rounded w-full">
+      <option value="">--Select Seat--</option>
+      {% for seat in available_seats %}
+      <option value="{{ seat }}">{{ seat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+    ✅ Update Seat & Shift
+  </button>
+</form>
+
+<!-- Dynamic Seat Update Script -->
+<script>
+document.getElementById("shiftSelect").addEventListener("change", function() {
+    const shift = this.value;
+    const seatSelect = document.getElementById("seatSelect");
+    const studentId = document.querySelector("input[name='student_id']").value;
+
+    seatSelect.innerHTML = "<option>Loading...</option>";
+
+    fetch(`/get_available_seats?shift=${encodeURIComponent(shift)}&student_id=${studentId}`)
+    .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+    })
+    .then(data => {
+        seatSelect.innerHTML = "";
+        if (data.seats && data.seats.length > 0) {
+            data.seats.forEach(seat => {
+                const option = document.createElement("option");
+                option.value = seat;
+                option.textContent = seat;
+                seatSelect.appendChild(option);
+            });
+        } else {
+            seatSelect.innerHTML = "<option>No available seats</option>";
+        }
+    })
+    .catch(err => {
+        seatSelect.innerHTML = "<option>Error loading seats</option>";
+        console.error("Fetch error:", err);
+    });
+});
+</script>
+</div>
+
+  <!-- 📊 Monthly Summary Table -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow">
+    <h3 class="text-xl font-semibold text-white mb-4">📊 Monthly Summary</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-gray-900 text-white rounded">
+        <thead>
+          <tr class="bg-gray-700">
+            <th class="py-2 px-4 text-left">Month</th>
+            <th class="py-2 px-4 text-left">Present Days</th>
+            <th class="py-2 px-4 text-left">Payment Status</th>
+            <th class="py-2 px-4 text-left">Payment Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in monthly_data %}
+          <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+            <td class="py-2 px-4">{{ m.month }}</td>
+            <td class="py-2 px-4">{{ m.present_days }}</td>
+            <td class="py-2 px-4 {% if m.payment_status == 'Paid' %}text-green-400{% else %}text-red-400{% endif %}">
+              {{ m.payment_status }}
+            </td>
+            <td class="py-2 px-4">{{ m.payment_date }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}
